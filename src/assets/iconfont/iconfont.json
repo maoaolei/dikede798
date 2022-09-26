@@ -1,0 +1,30 @@
+{
+  "id": "3652931",
+  "name": "测试项目",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "553324",
+      "name": "验证 验证码",
+      "font_class": "yanzhengyanzhengma",
+      "unicode": "e624",
+      "unicode_decimal": 58916
+    },
+    {
+      "icon_id": "2273350",
+      "name": "床",
+      "font_class": "chuang",
+      "unicode": "e685",
+      "unicode_decimal": 59013
+    },
+    {
+      "icon_id": "15112775",
+      "name": "宽带",
+      "font_class": "kuandai",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    }
+  ]
+}
