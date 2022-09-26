@@ -12,6 +12,9 @@ export default {
     },
     SET_MSG(state, msg) {
       state.msg = msg
+    },
+    REMOVE_TOKEN(state) {
+      state.token = null
     }
   },
   actions: {

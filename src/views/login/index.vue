@@ -42,6 +42,7 @@
             type="text"
             tabindex="1"
             auto-complete="on"
+            @keyup.enter.native="add"
           />
           <span class="codeimg" @click="freshen"><img :src="baseURL+codeimg" alt=""></span>
         </el-form-item>
@@ -118,6 +119,9 @@ export default {
       this.$nextTick(() => {
         this.$refs.password.focus()
       })
+    },
+    add() {
+      this.handleLogin()
     },
     async handleLogin() {
       try {
