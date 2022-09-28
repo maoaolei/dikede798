@@ -14,6 +14,9 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+var dayjs = require('dayjs')
+// import dayjs from 'dayjs' // ES 2015
+dayjs().format()
 
 /**
  * If you don't want to use mock-server

@@ -56,7 +56,8 @@ export default {
   overflow: hidden;
   position: relative;
   // background: #fff;
-  background-image: -webkit-linear-gradient(left, #3d6df8, #5b8cff);
+  // background-image: -webkit-linear-gradient(left, #3d6df8, #5b8cff);
+  background-color: #4273fa;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
   .welcome {
     margin: 0 15px 0;
@@ -126,7 +127,7 @@ export default {
           cursor: pointer;
           position: absolute;
           right: -20px;
-          top: 25px;
+          top: 18px;
           font-size: 12px;
         }
       }
