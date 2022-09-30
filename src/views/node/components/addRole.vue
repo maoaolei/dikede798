@@ -8,24 +8,24 @@
       :before-close="cancle"
     >
       <h4>新增合作商</h4>
-      <el-form label-position="right" label-width="100px" :model="formLabelAlign">
-        <el-form-item label="合作商名称">
+      <el-form label-position="right" label-width="100px" :model="formLabelAlign" :rules="rules">
+        <el-form-item label="合作商名称" prop="name" :rules="[{required:true,message:'必填'}]">
           <el-input v-model="formLabelAlign.name" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="联系人">
-          <el-input v-model="formLabelAlign.region" placeholder="请输入"></el-input>
+          <el-input v-model="formLabelAlign.contact" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="联系电话">
-          <el-input v-model="formLabelAlign.type" placeholder="请输入"></el-input>
+          <el-input v-model="formLabelAlign.mobile" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="分成比例(%)">
-          <el-input v-model="formLabelAlign.type" placeholder="请输入"></el-input>
+          <el-input v-model="formLabelAlign.ratio" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="账号">
-          <el-input v-model="formLabelAlign.type" placeholder="请输入"></el-input>
+          <el-input v-model="formLabelAlign.account" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="密码">
-          <el-input v-model="formLabelAlign.type" placeholder="请输入"></el-input>
+          <el-input v-model="formLabelAlign.password" placeholder="请输入"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -46,7 +46,18 @@ export default {
   },
   data() {
     return {
-      formLabelAlign: {}
+      formLabelAlign: {
+        name: '',
+        contact: '',
+        mobile: '',
+        ratio: '',
+        account: '',
+        password: ''
+
+      },
+      rules: {
+        name: [{ required: true, message: '必填' }]
+      }
     }
   },
   methods: {

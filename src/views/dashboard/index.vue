@@ -34,11 +34,12 @@
           <div>
             <span class="title">销售数据</span><span class="date">2022.09.26 ~ {{ date }}</span>
             <span class="week">
-              <div :class="{active:index===0}" @click="index=0">周</div>
-              <div :class="{active:index===1}" @click="index=1">月</div>
-              <div :class="{active:index===2}" @click="index=2">年</div>
+              <div :class="{active:index===0}" @click="weeeek">周</div>
+              <div :class="{active:index===1}" @click="month">月</div>
+              <div :class="{active:index===2}" @click="year">年</div>
             </span>
           </div>
+          <!-- 折线图合饼图 -->
           <div class="echartsreal">
             <div id="zhexian"></div>
             <div id="zhuzhuang"></div>
@@ -112,6 +113,7 @@ export default {
       time: '',
       start: '2022-09-01 00:00:00',
       end: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      dateYear: '2022-01-01',
       dateStart: '2022-09-01',
       dateEacharts: '2022-09-26',
       date: dayjs().format('YYYY-MM-DD'),
@@ -122,7 +124,12 @@ export default {
       sixteen: '',
       hotGoodsList: [],
       top5: [],
-      all: ''
+      all: '',
+      xAxis: [],
+      zhuxAxis: [],
+      zhuyseries: [],
+      yseries: [],
+      weekdata: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
     }
   },
   computed: {
@@ -145,7 +152,8 @@ export default {
       return this.top5.reduce((acc, item) => acc + item.value, 0)
     }
   },
-  mounted() {
+  async mounted() {
+    await this.getAllPartners()
     this.add()
     this.zhexian()
     this.zhuzhuang()
@@ -154,17 +162,37 @@ export default {
     this.getHotGoods()
     this.getOrderInfo()
     this.getSaleMoney()
-    this.getAllPartners()
     this.getPartners()
-    this.getSalesData()
-    this.getSalesSpread()
+    this.getSalesData(1, this.dateEacharts)
+    this.getSalesSpread(this.dateEacharts)
   },
   methods: {
+    // 周 月 年 切换
+    async weeeek() {
+      this.index = 0
+      await this.getSalesData(1, this.dateEacharts)
+      await this.getSalesSpread(this.dateEacharts)
+      this.zhexian()
+      this.zhuzhuang()
+    },
+    async month() {
+      this.index = 1
+      await this.getSalesData(1, this.dateStart)
+      await this.getSalesSpread(this.dateStart)
+      this.zhexian()
+      this.zhuzhuang()
+    },
+    async year() {
+      this.index = 2
+      await this.getSalesData(2, this.dateYear)
+      await this.getSalesSpread(this.dateYear)
+      this.zhexian()
+      this.zhuzhuang()
+    },
     add() {
       var chartDom = document.getElementById('coleft')
       var myChart = echarts.init(chartDom)
       var option
-
       option = {
         title: {
           left: 'center'
@@ -181,9 +209,8 @@ export default {
 
         series: [
           {
-            name: 'Radius Mode',
             type: 'pie',
-            radius: [60, 130],
+            radius: [60, 110],
             center: ['50%', '40%'],
             roseType: 'radius',
             itemStyle: {
@@ -194,14 +221,10 @@ export default {
             },
             emphasis: {
               label: {
-                show: true
+                show: false
               }
             },
-            data: [{ value: 6.25, name: '佳佳6.25%' },
-              { value: 62.25, name: '金燕龙合作商62.5%' },
-              { value: 12.5, name: '天花物业12.5%' },
-              { value: 12.5, name: '北京合作商12.5%' },
-              { value: 6.25, name: 'Likede6.25%' }]
+            data: this.top5
 
           }
 
@@ -216,22 +239,39 @@ export default {
       var option
 
       option = {
+        color: 'red',
         title: {
           text: '销售额趋势图',
           left: '30%'
           // textAlign: 'left'
         },
-        xAxis: {
-          type: 'category',
-          data: ['星期一', '星期二', '星期三']
-        },
+        xAxis: [
+          {
+            type: 'category',
+            data: this.xAxis
+          }
+
+        ],
         yAxis: {
           type: 'value'
         },
         series: [
           {
-            data: [0, 1000, 2000, 3000, 4000, 5000, 6000],
-            type: 'line'
+            data: this.yseries,
+            type: 'line',
+            smooth: true,
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 0.5, [
+                {
+                  offset: 0,
+                  color: 'red'
+                },
+                {
+                  offset: 1,
+                  color: 'pink'
+                }
+              ])
+            }
           }
         ]
       }
@@ -244,6 +284,7 @@ export default {
       var option
 
       option = {
+        color: '#9fc1ff',
         title: {
           text: '销售额分布',
           left: '50%'
@@ -264,7 +305,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            data: this.zhuxAxis,
             axisTick: {
               alignWithLabel: true
             }
@@ -279,8 +320,9 @@ export default {
           {
             name: 'Direct',
             type: 'bar',
-            barWidth: '60%',
-            data: [10, 52, 200, 334, 390, 330, 220]
+            barWidth: '10%',
+            data: this.zhuyseries
+
           }
         ]
       }
@@ -310,11 +352,31 @@ export default {
         item.count = item.count + '单'
       })
     },
-    async getSalesData() {
-      await getSalesData(1, this.dateEacharts, this.date)
+    async getSalesData(a, b) {
+      const { data } = await getSalesData(a, b, this.date)
+      if (b === this.dateEacharts) {
+        // console.log(1)
+        this.xAxis = data.xAxis
+        // console.log(this.xAxis)
+        this.xAxis = this.weekdata.splice(0, this.xAxis.length)
+      }
+      if (b === this.dateStart) {
+        // console.log(2)
+        this.xAxis = ['9月1日', '9月6日', '9月11日', '9月16日', '9月21日', '9月26日']
+      }
+      if (a === 2) {
+        this.xAxis = data.xAxis
+      }
+      this.yseries = data.series
+      this.yseries = this.yseries.map(item => item / 100)
+      // console.log(this.yseries)
     },
-    async getSalesSpread() {
-      await getSalesSpread(this.dateEacharts, this.date)
+    async getSalesSpread(a) {
+      const { data } = await getSalesSpread(a, this.date)
+      this.zhuxAxis = data.xAxis
+      this.zhuyseries = data.series
+      this.zhuyseries = this.zhuyseries.map(item => item / 100)
+      console.log(data)
     },
     async getAllPartners() {
       const { data } = await getAllPartners()
@@ -328,6 +390,7 @@ export default {
       this.all = this.top5.reduce((acc, item) => acc + item.value, 0)
       this.top5.forEach(item => {
         item.value = (item.value / this.all) * 100
+        item.name = item.name + item.value + '%'
       })
       console.log(data)
     }
